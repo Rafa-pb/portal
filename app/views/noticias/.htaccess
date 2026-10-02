@@ -1,0 +1,4 @@
+<IfModule mod_autoindex.c>
+    # desabilita a listagem de diretório
+    Options -Indexes
+</IfModule>
