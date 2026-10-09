@@ -1,3 +1,21 @@
+<!-- Correção de alinhamento dos Dropdowns -->
+<style>
+    @media (min-width: 992px) {
+        /* Garante que os itens normais sirvam de âncora para os seus submenus */
+        .navbar-nav .nav-item.dropdown:not(.static) {
+            position: relative !important;
+        }
+        /* Alinha a caixa branca exatamente abaixo e à esquerda da palavra */
+        .navbar-nav .nav-item.dropdown:not(.static) > .dropdown-menu {
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            right: auto !important;
+            margin-top: 0;
+        }
+    }
+</style>
+
 <!-- header -->
 <header class="site-header" id="header">
     <nav class="navbar navbar-expand-lg transparent-bg static-nav">
@@ -46,7 +64,7 @@
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <h5 class="dropdown-title bottom10">EDITAIS</h5>
-                            <a class="dropdown-item" href="<?= BASE_URL ?>noticiasgerais">Acessar Editais</a>                           
+                            <a class="dropdown-item" href="<?= BASE_URL ?>noticiasgerais">Acessar Editais</a>                          
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <h5 class="dropdown-title bottom10">RELATÓRIOS</h5>
@@ -70,7 +88,6 @@
         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">TVPARQUE</a>
         <div class="dropdown-menu">
             <a class="dropdown-item" href="https://www.youtube.com/channel/UCRTE5pPRkGvSEZfQr4LXXDg" target="_blank">TVParque</a>
-            <a class="dropdown-item" href="https://www.youtube.com/channel/UCRTE5pPRkGvSEZfQr4LXXDg" target="_blank">Canal Youtube</a>
         </div>
     </li>
 
@@ -80,7 +97,6 @@
             <a class="dropdown-item" href="https://sgi.paqtc.org.br" target="_blank">SGI - Coordenador</a>
             <a class="dropdown-item" href="https://sgi.paqtc.org.br/Portal_Transparencia/" target="_blank">Portal da Transparência - SGI</a>
             <a class="dropdown-item" href="https://paqtcpb.conveniar.com.br/portaltransparencia/" target="_blank">Portal da Transparência - Conveniar</a>
-            <a class="dropdown-item" href="<?= BASE_URL ?>redemetro">Rede Metro CG</a>
         </div>
     </li>
 </ul>
@@ -141,8 +157,7 @@
                     </a>
                     <div id="sideNavTVParque" class="collapse">
                         <ul class="navbar-nav mt-2">
-                            <li><a class="nav-link" href="https://www.youtube.com/channel/UCRTE5pPRkGvSEZfQr4LXXDg" target="_blank">Sobre a TVParque</a></li>
-                            <li><a class="nav-link" href="https://www.youtube.com/channel/UCRTE5pPRkGvSEZfQr4LXXDg" target="_blank">Serviços</a></li>
+                            <li><a class="nav-link" href="https://www.youtube.com/channel/UCRTE5pPRkGvSEZfQr4LXXDg" target="_blank">TVParque</a></li>
                         </ul>
                     </div>
                 </li>
@@ -155,7 +170,6 @@
                             <li><a class="nav-link" href="https://sgi.paqtc.org.br" target="_blank">SGI-Coordenador</a></li>
                             <li><a class="nav-link" href="https://sgi.paqtc.org.br/Portal_Transparencia/" target="_blank">Portal da Transparência - SGI</a></li>
                             <li><a class="nav-link" href="https://paqtcpb.conveniar.com.br/portaltransparencia/" target="_blank">Portal da Transparência - Conveniar</a></li>
-                            <li><a class="nav-link" href="<?= BASE_URL ?>redemetro">Rede Metro CG</a></li>
                         </ul>
                     </div>
                 </li>

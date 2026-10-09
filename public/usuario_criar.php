@@ -4,25 +4,31 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_categoria'] !== 'Admin
     header("Location: painel.php");
     exit;
 }
-
 include __DIR__ . '/../config/config.php';
-
 $mensagem = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = mysqli_real_escape_string($conn, $_POST['nome'] ?? '');
-    $email = mysqli_real_escape_string($conn, $_POST['email'] ?? '');
-    $senha = password_hash($_POST['senha'] ?? '', PASSWORD_DEFAULT);
-    $categoria = mysqli_real_escape_string($conn, $_POST['categoria'] ?? '');
+    $nome = $_POST['nome'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $senhaRaw = $_POST['senha'] ?? '';
+    $categoria = $_POST['categoria'] ?? '';
 
-    if ($nome && $email && $senha && $categoria) {
-        $sql = "INSERT INTO tbusuario (NmUsuario, Email, senha, categoria) VALUES ('$nome', '$email', '$senha', '$categoria')";
+    if (!empty($nome) && !empty($email) && !empty($senhaRaw) && !empty($categoria)) {
+        $senhaHash = password_hash($senhaRaw, PASSWORD_DEFAULT);
 
-        if (mysqli_query($conn, $sql)) {
-            header("Location: usuarios_listar.php");
-            exit;
+        $stmt = mysqli_prepare($conn, "INSERT INTO tbusuario (NmUsuario, Email, senha, categoria) VALUES (?, ?, ?, ?)");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "ssss", $nome, $email, $senhaHash, $categoria);
+            if (mysqli_stmt_execute($stmt)) {
+                mysqli_stmt_close($stmt);
+                header("Location: usuarios_listar.php");
+                exit;
+            } else {
+                $mensagem = 'Erro ao cadastrar usuário.';
+            }
+            mysqli_stmt_close($stmt);
         } else {
-            $mensagem = 'Erro ao cadastrar: ' . mysqli_error($conn);
+            $mensagem = 'Erro na preparação da consulta.';
         }
     } else {
         $mensagem = 'Todos os campos são obrigatórios.';
@@ -41,14 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </style>
 </head>
 <body>
-	<?php include 'navbar_admin.php'; ?>
+<?php include 'navbar_admin.php'; ?>
 <div class="form-box">
   <h4 class="mb-4">Cadastrar Novo Usuário</h4>
-
   <?php if ($mensagem): ?>
-    <div class="alert alert-danger"> <?= $mensagem ?> </div>
+    <div class="alert alert-danger"> <?= htmlspecialchars($mensagem) ?> </div>
   <?php endif; ?>
-
   <form method="POST">
     <div class="mb-3">
       <label class="form-label">Nome</label>

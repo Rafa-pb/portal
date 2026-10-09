@@ -4,38 +4,53 @@ if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
 }
-
 include __DIR__ . '/../config/config.php';
 
-// Filtros
+// Filtros seguros
 $filtroStatus = $_GET['status'] ?? '';
 $filtroCategoria = $_GET['categoria'] ?? '';
 $filtroTitulo = $_GET['titulo'] ?? '';
 $filtroData = $_GET['data'] ?? '';
 
 $where = [];
-if ($filtroStatus) {
-    $where[] = "status = '" . mysqli_real_escape_string($conn, $filtroStatus) . "'";
+$params = [];
+$types = "";
+
+if ($filtroStatus !== '') {
+    $where[] = "status = ?";
+    $params[] = $filtroStatus;
+    $types .= "s";
 }
-if ($filtroCategoria) {
-    $where[] = "categoria = '" . mysqli_real_escape_string($conn, $filtroCategoria) . "'";
+if ($filtroCategoria !== '') {
+    $where[] = "categoria = ?";
+    $params[] = $filtroCategoria;
+    $types .= "s";
 }
-if ($filtroTitulo) {
-    $where[] = "titulo LIKE '%" . mysqli_real_escape_string($conn, $filtroTitulo) . "%'";
+if ($filtroTitulo !== '') {
+    $where[] = "titulo LIKE ?";
+    $params[] = "%" . $filtroTitulo . "%";
+    $types .= "s";
 }
-if ($filtroData) {
-    $where[] = "datacadastro = '" . mysqli_real_escape_string($conn, $filtroData) . "'";
+if ($filtroData !== '') {
+    $where[] = "datacadastro = ?";
+    $params[] = $filtroData;
+    $types .= "s";
 }
 
 $sqlFiltro = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
-
 $query = "SELECT idNoticia, datacadastro, titulo, categoria, autor, status FROM tbnoticias $sqlFiltro ORDER BY idNoticia DESC";
-$res = mysqli_query($conn, $query);
+
+$stmt = mysqli_prepare($conn, $query);
+if (!empty($params)) {
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
+}
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
 
 $categorias = mysqli_query($conn, "SELECT DISTINCT categoria FROM tbnoticias ORDER BY categoria ASC");
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
   <title>Listar Notícias</title>
@@ -71,7 +86,7 @@ $categorias = mysqli_query($conn, "SELECT DISTINCT categoria FROM tbnoticias ORD
     </div>
     <div class="col-md-3">
       <label class="form-label">Título</label>
-      <input type="text" name="titulo" value="<?= htmlspecialchars($filtroTitulo) ?>" class="form-control" placeholder="Buscar por título...">
+      <input type="text" name="titulo" value="<?= htmlspecialchars($filtroTitulo) ?>" class="form-control" placeholder="Pesquisar por título...">
     </div>
     <div class="col-md-3">
       <label class="form-label">Data</label>
@@ -125,11 +140,14 @@ $categorias = mysqli_query($conn, "SELECT DISTINCT categoria FROM tbnoticias ORD
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
-              Tem certeza que deseja excluir a notícia <strong>#<?= $row['idNoticia'] ?></strong>?
+              Tem a certeza de que pretende excluir a notícia <strong>#<?= $row['idNoticia'] ?></strong>?
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <a href="noticia_excluir.php?id=<?= $row['idNoticia'] ?>" class="btn btn-danger">Excluir</a>
+              <form action="noticia_excluir.php" method="POST" class="d-inline">
+                <input type="hidden" name="id" value="<?= $row['idNoticia'] ?>">
+                <button type="submit" class="btn btn-danger">Excluir</button>
+              </form>
             </div>
           </div>
         </div>
